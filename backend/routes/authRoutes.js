@@ -1,13 +1,13 @@
 import express from "express";
-import pool from "../database/db.js"; // updated import to pool
+import db from "../database/db.js";
 
 const router = express.Router();
 
-// ✅ Register user
+// Register user
 router.post("/register", async (req, res) => {
   const { username, password } = req.body;
   try {
-    const result = await pool.query(
+    const result = await db.query(
       "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
       [username, password]
     );
@@ -18,11 +18,11 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ✅ Login user
+// Login user
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
-    const result = await pool.query(
+    const result = await db.query(
       "SELECT * FROM users WHERE username = $1 AND password = $2",
       [username, password]
     );

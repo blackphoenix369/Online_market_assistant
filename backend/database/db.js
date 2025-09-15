@@ -8,19 +8,15 @@ const pool = new Pool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASSWORD, // must match Render DB
   database: process.env.DB_NAME,
   ssl: {
-    rejectUnauthorized: false, // ✅ required for Render PostgreSQL
+    rejectUnauthorized: false, // required for Render Postgres
   },
 });
 
-// ✅ Test connection once on startup
 pool.connect()
-  .then(client => {
-    console.log("✅ PostgreSQL Database Connected Successfully!");
-    client.release(); // release the connection back to the pool
-  })
+  .then(() => console.log("✅ PostgreSQL Database Connected Successfully!"))
   .catch(err => console.error("❌ DB connection failed:", err));
 
 export default pool;
