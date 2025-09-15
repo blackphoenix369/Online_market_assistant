@@ -1,31 +1,31 @@
 import express from "express";
-import db from "./database/db.js";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
 
-// Serve frontend static files
-app.use(express.static("frontend"));
+// ✅ To get directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Default route (login page)
+// ✅ Serve frontend static files
+app.use(express.static(path.join(__dirname, "../frontend")));
+
+// ✅ Default route (login page)
 app.get("/", (req, res) => {
-  res.sendFile("index.html", { root: "frontend" });
+  res.sendFile("index.html", { root: path.join(__dirname, "../frontend") });
 });
 
-// Routes
-import authRoutes from "./routes/authRoutes.js";
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, async () => {
-  try {
-    await db.connect(); // connect to MySQL
-    console.log("✅ MySQL Database Connected Successfully!");
-  } catch (err) {
-    console.error("❌ DB connection failed:", err);
-  }
+app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

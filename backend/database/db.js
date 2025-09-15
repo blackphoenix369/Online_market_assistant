@@ -1,17 +1,23 @@
-// backend/database/db.js
 import pkg from "pg";
 const { Pool } = pkg;
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const pool = new Pool({
-  host: process.env.DB_HOST,     // Render DB hostname
-  port: process.env.DB_PORT,     // Render DB port
-  user: process.env.DB_USER,     // Render DB user
-  password: process.env.DB_PASS, // Render DB password
-  database: process.env.DB_NAME, // Render DB name
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   ssl: {
-    rejectUnauthorized: false,   // Required on Render
+    rejectUnauthorized: false, // ✅ required for Render deployment
   },
 });
 
-// ✅ Export as default so `import db from ...` works
+// ✅ Test connection
+pool.connect()
+  .then(() => console.log("✅ PostgreSQL Database Connected Successfully!"))
+  .catch(err => console.error("❌ DB connection failed:", err));
+
 export default pool;

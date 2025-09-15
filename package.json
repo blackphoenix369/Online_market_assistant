@@ -6,7 +6,8 @@
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+     "build": "cd frontend && npm install && npm run build"
   },
   "author": "Rohit_Chakraborty",
   "license": "MIT",

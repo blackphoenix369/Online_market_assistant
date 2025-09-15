@@ -3,21 +3,38 @@ import db from "../database/db.js";
 
 const router = express.Router();
 
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
+// Example: Register user
+router.post("/register", async (req, res) => {
+  const { username, password } = req.body;
   try {
-    const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
-    if (rows.length === 0) return res.status(401).json({ message: "Invalid email or password" });
-
-    const user = rows[0];
-
-    if (password !== user.password) return res.status(401).json({ message: "Invalid email or password" });
-
-    res.json({ token: "dummy-token-for-testing" });
+    const result = await db.query(
+      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
+      [username, password]
+    );
+    res.json({ success: true, user: result.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Login failed", error: err });
+    console.error("❌ Error inserting user:", err);
+    res.status(500).json({ success: false, error: "Database error" });
+  }
+});
+
+// Example: Login user
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const result = await db.query(
+      "SELECT * FROM users WHERE username = $1 AND password = $2",
+      [username, password]
+    );
+
+    if (result.rows.length > 0) {
+      res.json({ success: true, user: result.rows[0] });
+    } else {
+      res.status(401).json({ success: false, error: "Invalid credentials" });
+    }
+  } catch (err) {
+    console.error("❌ Error logging in:", err);
+    res.status(500).json({ success: false, error: "Database error" });
   }
 });
 
