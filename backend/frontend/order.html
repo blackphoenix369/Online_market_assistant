@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders - Online Market Assistant</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Orders</h1>
+    <form id="orderForm">
+      <input type="text" id="productId" placeholder="Product ID" required>
+      <input type="number" id="quantity" placeholder="Quantity" required>
+      <button type="submit">Place Order</button>
+    </form>
+
+    <h2>Your Orders</h2>
+    <ul id="orderList"></ul>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
