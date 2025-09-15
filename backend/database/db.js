@@ -1,23 +1,17 @@
 // backend/database/db.js
-import mysql from "mysql2/promise";
-import dotenv from "dotenv";
+import pkg from "pg";
+const { Pool } = pkg;
 
-dotenv.config();
-
-const dbHost = process.env.DB_HOST || "localhost"; // Only one fallback
-const dbUser = process.env.DB_USER || "root";
-const dbPass = process.env.DB_PASS || "Rohit@2025";
-const dbName = process.env.DB_NAME || "artisan_market";
-const dbPort = process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 3306;
-
-const db = await mysql.createConnection({
-  host: dbHost,
-  user: dbUser,
-  password: dbPass,
-  database: dbName,
-  port: dbPort,
+const pool = new Pool({
+  host: process.env.DB_HOST,     // Render DB hostname
+  port: process.env.DB_PORT,     // Render DB port
+  user: process.env.DB_USER,     // Render DB user
+  password: process.env.DB_PASS, // Render DB password
+  database: process.env.DB_NAME, // Render DB name
+  ssl: {
+    rejectUnauthorized: false,   // Required on Render
+  },
 });
 
-console.log("✅ MySQL Database Connected Successfully!");
-
-export default db;
+// ✅ Export as default so `import db from ...` works
+export default pool;
