@@ -4,27 +4,32 @@ const errorMsg = document.getElementById("errorMsg");
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const username = document.getElementById("email").value; // or "username" if your DB uses username
-  const password = document.getElementById("password").value;
+  // Get values from input fields
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   try {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }) // ⚠ should match backend field names
+      body: JSON.stringify({ email, password }) // 👈 must match backend field names
     });
 
     const data = await res.json();
 
     if (res.ok) {
-      // If you want JWT token later, backend should return it
-      // localStorage.setItem("token", data.token);
-      window.location.href = "/dashboard.html"; // redirect on successful login
+      // Store token if backend provides it
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      // Redirect after successful login
+      window.location.href = "/dashboard.html";
     } else {
-      errorMsg.textContent = data.error || "Invalid credentials"; // matches backend JSON
+      // Show error message
+      errorMsg.textContent = data.error || data.message || "Invalid credentials";
     }
   } catch (err) {
-    console.error(err);
-    errorMsg.textContent = "Something went wrong!";
+    console.error("Login request failed:", err);
+    errorMsg.textContent = "Something went wrong! Please try again.";
   }
 });
