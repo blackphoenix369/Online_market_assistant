@@ -1,47 +1,26 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
+import dotenv from "dotenv";
+import cors from "cors";
+
 import authRoutes from "./routes/authRoutes.js";
 
+dotenv.config();
+
 const app = express();
+
+// ✅ Middlewares
+app.use(cors());
 app.use(express.json());
 
-// -------------------------------
-// API Routes
-// -------------------------------
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 
-// -------------------------------
-// Static Frontend
-// -------------------------------
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Serve frontend from backend/frontend
-app.use(express.static(path.join(__dirname, "frontend")));
-
-// Default → index.html (login)
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+  res.send("🚀 Backend server is running...");
 });
 
-// Dashboard route
-app.get("/dashboard", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dashboard.html"));
-});
-
-// Product route
-app.get("/product", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "product.html"));
-});
-
-// Orders route
-app.get("/order", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "order.html"));
-});
-
-// -------------------------------
-// Start server
-// -------------------------------
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
