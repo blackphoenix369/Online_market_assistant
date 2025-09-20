@@ -1,5 +1,6 @@
+// backend/routes/authRoutes.js
 import express from "express";
-import db from "../db.js";
+import db from "../database/db.js";
 
 const router = express.Router();
 
@@ -8,7 +9,7 @@ router.post("/register", async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await db.query(
-      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
+      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
       [username, password]
     );
     res.json({ success: true, user: result.rows[0] });
