@@ -3,25 +3,26 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-import authRoutes from "./routes/authRoutes.js"; // your auth routes
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 const app = express();
 app.use(express.json());
 
-// ✅ To get directory name in ES modules
+// ✅ Resolve directory name in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Serve frontend static files
-app.use(express.static(path.join(__dirname, "../frontend")));
+// ✅ Serve static frontend (React build or plain frontend)
+const frontendPath = path.join(__dirname, "../frontend/build"); // change to "../frontend" if plain HTML
+app.use(express.static(frontendPath));
 
-// ✅ Default route (login page)
-app.get("/", (req, res) => {
-  res.sendFile("index.html", { root: path.join(__dirname, "../frontend") });
+// ✅ Default route -> send index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
-// ✅ Routes
+// ✅ API routes
 app.use("/api/auth", authRoutes);
 
 // ✅ Start server
