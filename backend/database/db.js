@@ -4,11 +4,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+// ✅ Use DATABASE_URL from Render
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }, // ✅ Required for Render
+  ssl: { rejectUnauthorized: false } // Render requires SSL
 });
 
+// ✅ Test connection
 pool.connect()
   .then(() => console.log("✅ PostgreSQL Database Connected Successfully!"))
   .catch(err => console.error("❌ DB connection failed:", err));

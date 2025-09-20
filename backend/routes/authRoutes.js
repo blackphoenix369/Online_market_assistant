@@ -1,5 +1,5 @@
 import express from "express";
-import db from "../database/db.js";
+import db from "../db.js";
 
 const router = express.Router();
 
@@ -8,7 +8,7 @@ router.post("/register", async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await db.query(
-      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *",
+      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id, username",
       [username, password]
     );
     res.json({ success: true, user: result.rows[0] });
