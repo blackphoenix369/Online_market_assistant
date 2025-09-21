@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
 import pool from "./database/db.js";
+import fs from "fs";
 
 dotenv.config();
 const app = express();
@@ -25,14 +26,29 @@ app.use("/api/auth", authRoutes);
 // ----------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const frontendPath = path.join(__dirname, "../frontend");
 
-app.use(express.static(frontendPath));
-app.get("*", (req, res, next) => {
-  res.sendFile(path.join(frontendPath, "index.html"), (err) => {
-    if (err) next(err);
+// Try common frontend paths
+const possibleFrontendPaths = [
+  path.join(__dirname, "../frontend"), // root/frontend
+  path.join(__dirname, "frontend")     // backend/frontend
+];
+
+let frontendPath = possibleFrontendPaths.find(p => fs.existsSync(p));
+
+if (!frontendPath) {
+  console.warn("⚠️ Frontend folder not found! Please ensure frontend exists.");
+} else {
+  console.log("✅ Frontend folder found at:", frontendPath);
+  app.use(express.static(frontendPath));
+  app.get("*", (req, res, next) => {
+    const indexFile = path.join(frontendPath, "index.html");
+    if (fs.existsSync(indexFile)) {
+      res.sendFile(indexFile);
+    } else {
+      next(new Error("index.html not found in frontend folder"));
+    }
   });
-});
+}
 
 // ----------------------------
 // Error handling
