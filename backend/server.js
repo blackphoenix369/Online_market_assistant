@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
-import pool from "./db.js";
+import pool from "./database/db.js";  
 
 dotenv.config();
 const app = express();
