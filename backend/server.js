@@ -12,6 +12,9 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.get("/api", (req, res) => {
+  res.json({ message: "✅ Online Market Assistant API is working!" });
+});
 
 // Default route
 app.get("/", (req, res) => {
