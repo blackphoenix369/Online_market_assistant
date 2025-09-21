@@ -1,5 +1,5 @@
 // backend/setupFullDB.js
-import db from "./database/db.js"; // adjust path if needed
+import pool from "./database/db.js"; // mysql2 pool
 
 const schema = `
 DROP TABLE IF EXISTS orders;
@@ -35,37 +35,37 @@ CREATE TABLE orders (
 
 const seedData = async () => {
   try {
-    // Enable multiple statements temporarily
-    await db.query("SET SESSION sql_mode='STRICT_ALL_TABLES'");
+    const conn = await pool.getConnection();
 
     // Split schema into separate statements
     const statements = schema.split(";").filter(s => s.trim());
-
     for (const stmt of statements) {
-      await db.query(stmt);
+      await conn.query(stmt);
     }
 
     // Insert sample data
-    await db.query(`
+    await conn.query(`
       INSERT INTO users (name, email, password) VALUES
       ('Alice Johnson', 'alice@example.com', 'alice123'),
       ('Bob Smith', 'bob@example.com', 'bob123'),
       ('Charlie Brown', 'charlie@example.com', 'charlie123');
     `);
 
-    await db.query(`
+    await conn.query(`
       INSERT INTO products (name, description, price) VALUES
       ('Handmade Necklace', 'Beautiful artisan necklace made with natural stones.', 25.50),
       ('Wooden Sculpture', 'Carved wooden sculpture representing tribal art.', 120.00),
       ('Ceramic Vase', 'Colorful ceramic vase, hand-painted.', 45.75);
     `);
 
-    await db.query(`
+    await conn.query(`
       INSERT INTO orders (user_id, product_id, quantity) VALUES
       (1, 1, 2),
       (2, 2, 1),
       (3, 3, 3);
     `);
+
+    conn.release();
 
     console.log("✅ Database setup and sample data inserted successfully!");
     process.exit(0);
