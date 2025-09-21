@@ -1,57 +1,63 @@
 // backend/controllers/userController.js
-const db = require("../database/db");
+import pool from "../database/db.js";
 
-module.exports = {
-  // Get user profile by ID
-  getUserProfile: async (req, res) => {
-    try {
-      const { user_id } = req.params;
+// ----------------------------
+// Get user profile by ID
+// ----------------------------
+export const getUserProfile = async (req, res) => {
+  try {
+    const { user_id } = req.params;
 
-      const users = await db.query(
-        "SELECT user_id, name, email, role, created_at FROM users WHERE user_id = ?",
-        [user_id]
-      );
+    const result = await pool.query(
+      "SELECT user_id, name, email, role, created_at FROM users WHERE user_id = $1",
+      [user_id]
+    );
 
-      if (users.length === 0) {
-        return res.status(404).json({ error: "User not found" });
-      }
+    const user = result.rows[0];
 
-      res.json(users[0]);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to fetch user profile" });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
     }
-  },
 
-  // Update profile info
-  updateUserProfile: async (req, res) => {
-    try {
-      const { user_id } = req.params;
-      const { name, email } = req.body;
+    res.json(user);
+  } catch (err) {
+    console.error("❌ Database error:", err.message);
+    res.status(500).json({ error: "Failed to fetch user profile" });
+  }
+};
 
-      await db.query(
-        "UPDATE users SET name = ?, email = ? WHERE user_id = ?",
-        [name, email, user_id]
-      );
+// ----------------------------
+// Update profile info
+// ----------------------------
+export const updateUserProfile = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const { name, email } = req.body;
 
-      res.json({ message: "Profile updated successfully!" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to update profile" });
-    }
-  },
+    await pool.query(
+      "UPDATE users SET name = $1, email = $2 WHERE user_id = $3",
+      [name, email, user_id]
+    );
 
-  // Get all artisans
-  getArtisans: async (req, res) => {
-    try {
-      const artisans = await db.query(
-        "SELECT user_id, name, email, created_at FROM users WHERE role = 'artisan'"
-      );
+    res.json({ message: "Profile updated successfully!" });
+  } catch (err) {
+    console.error("❌ Database error:", err.message);
+    res.status(500).json({ error: "Failed to update profile" });
+  }
+};
 
-      res.json(artisans);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to fetch artisans" });
-    }
-  },
+// ----------------------------
+// Get all artisans
+// ----------------------------
+export const getArtisans = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT user_id, name, email, created_at FROM users WHERE role = 'artisan'"
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("❌ Database error:", err.message);
+    res.status(500).json({ error: "Failed to fetch artisans" });
+  }
 };
