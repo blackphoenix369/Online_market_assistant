@@ -1,23 +1,29 @@
-// backend/server.js
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
+import pool from "./db.js";
 
 dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
-// Routes
+// API routes
 app.use("/api/auth", authRoutes);
 
-// Default route
-app.get("/", (req, res) => {
-  res.send("🚀 Online Market Assistant API Running...");
+// ----------------------------
+// Serve static frontend (HTML, CSS, JS)
+// ----------------------------
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+app.use(express.static(path.join(__dirname, "../frontend")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend", "index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
