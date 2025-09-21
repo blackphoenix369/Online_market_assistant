@@ -1,4 +1,3 @@
-// backend/server.js
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,7 +15,7 @@ const app = express();
 // ----------------------------
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL || "*", credentials: true }));
-// app.use(helmet()); // optional, uncomment when helmet is installed
+// app.use(helmet()); // optional
 
 // ----------------------------
 // API routes
@@ -24,20 +23,18 @@ app.use(cors({ origin: process.env.CLIENT_URL || "*", credentials: true }));
 app.use("/api/auth", authRoutes);
 
 // ----------------------------
-// Serve static frontend (HTML, CSS, JS) in production
+// Serve static frontend
 // ----------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "index.html"));
-  });
-}
+app.use(express.static(path.join(__dirname, "../frontend")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+});
 
 // ----------------------------
-// Error Handling Middleware
+// Error Handling
 // ----------------------------
 app.use((err, req, res, next) => {
   console.error("❌ Error:", err.stack);
@@ -47,17 +44,18 @@ app.use((err, req, res, next) => {
 // ----------------------------
 // Start server after DB check
 // ----------------------------
-const PORT = process.env.PORT || 8080;
+//const PORT = process.env.PORT || 8080;
 
 (async () => {
   try {
-    // Simple query to test DB
     const [rows] = await pool.query("SELECT 1 + 1 AS result");
     console.log("✅ Database connected, test result:", rows[0].result);
 
+    const PORT = process.env.PORT || 5000;
     app.listen(PORT, "0.0.0.0", () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-    });
+  console.log(`🚀 Server running locally at http://localhost:${PORT}`);
+});
+
   } catch (err) {
     console.error("❌ Database connection error:", err.message);
     process.exit(1);
