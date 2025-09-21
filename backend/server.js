@@ -15,6 +15,16 @@ const app = express();
 // ----------------------------
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL || "*", credentials: true }));
+app.get("*", (req, res, next) => {
+  const indexFile = path.join(frontendPath, "index.html");
+  if (fs.existsSync(indexFile)) {
+    res.sendFile(indexFile);
+  } else {
+    console.error("❌ index.html not found at:", indexFile);
+    next(new Error("Frontend index.html missing! Build your frontend first."));
+  }
+});
+
 
 // ----------------------------
 // API Routes
