@@ -1,4 +1,4 @@
-// server.js
+// backend/server.js
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -16,7 +16,7 @@ const app = express();
 // ----------------------------
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL || "*", credentials: true }));
-app.use(helmet());
+// app.use(helmet()); // optional, uncomment when helmet is installed
 
 // ----------------------------
 // API routes
@@ -49,14 +49,17 @@ app.use((err, req, res, next) => {
 // ----------------------------
 const PORT = process.env.PORT || 8080;
 
-pool.connect()
-  .then(() => {
-    console.log("✅ Database connected");
+(async () => {
+  try {
+    // Simple query to test DB
+    const [rows] = await pool.query("SELECT 1 + 1 AS result");
+    console.log("✅ Database connected, test result:", rows[0].result);
+
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
-  })
-  .catch((err) => {
+  } catch (err) {
     console.error("❌ Database connection error:", err.message);
     process.exit(1);
-  });
+  }
+})();
